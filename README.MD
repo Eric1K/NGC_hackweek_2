@@ -1,0 +1,1 @@
+Download yolo11x.pt from https://github.com/ultralytics/ultralytics?tab=readme-ov-file otherwise you can't run any python files
