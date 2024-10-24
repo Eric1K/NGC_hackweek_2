@@ -12,7 +12,7 @@ def detect(path):
     Runs model on a single file
     """
 
-    # Load the YOLO11 model
+    # Load the YOLO11 model. YOU MIGHT NEED TO DOWNLOAD SINCE GITHUB FILE SIZE CAP IS 100MB
     model = YOLO('yolo11x.pt')
 
     # Read image
