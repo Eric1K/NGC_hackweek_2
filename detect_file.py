@@ -25,8 +25,12 @@ def plot_result(result):
     """
     Plots the result using matplotlib
     """
-    result[0].plot()
-    plt.imshow(result[0].plot(show=False)) # show=False hides temp image
+    result_img = result[0].plot(show=False) # show = False hides temp image
+
+    # Convert the image from BGR to RGB
+    result_img_rgb = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
+
+    plt.imshow(result_img_rgb)  # Show the image in RGB format
     plt.axis('off') 
     plt.show()
 
@@ -47,7 +51,9 @@ def save_result(result, output_dir, filename):
     
     # Plot the result 
     result_img = result[0].plot(show=False) 
-    plt.imshow(result_img)
+    result_img_rgb = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
+
+    plt.imshow(result_img_rgb)
     plt.axis('off')
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close() 

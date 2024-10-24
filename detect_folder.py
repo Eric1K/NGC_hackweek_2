@@ -26,9 +26,12 @@ def plot_result(result):
     """
     Plots the result using matplotlib
     """
+    result_img = result[0].plot(show=False) # show = False hides temp image
 
-    result[0].plot()
-    plt.imshow(result[0].plot(show=False)) # show=False hides temp image
+    # Convert the image from BGR to RGB
+    result_img_rgb = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
+
+    plt.imshow(result_img_rgb)  # Show the image in RGB format
     plt.axis('off') 
     plt.show()
 
@@ -41,7 +44,6 @@ def save_result(result, output_dir, filename):
     """
     Saves the result with detections to output folder
     """
-
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
@@ -50,7 +52,9 @@ def save_result(result, output_dir, filename):
     
     # Plot the result 
     result_img = result[0].plot(show=False) 
-    plt.imshow(result_img)
+    result_img_rgb = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
+
+    plt.imshow(result_img_rgb)
     plt.axis('off')
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close() 
@@ -80,8 +84,8 @@ def process_folder(input_folder, output_folder):
             save_result(result, output_folder, file)
 
 if __name__ == "__main__":
-    input_folder = 'prenotedimage/'  # Folder containing images
-    output_folder = 'prenoteoutput/'  # Folder where output images will be saved
+    input_folder = 'Images/'  # Folder containing images
+    output_folder = 'output/'  # Folder where output images will be saved
     
     # Process all images in the input folder and saves to output folder
     process_folder(input_folder, output_folder)

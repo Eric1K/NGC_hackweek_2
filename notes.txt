@@ -6,6 +6,9 @@ See if can be added:
 - shelf
 - camera
 - building
+- books / bookshelves
+- pillows
+- fruit keeps getting detected as apple
 
 # First, detect objects using YOLO11 base model
 # Then, train a custom one based on the data set (And Roboflow thousands of images) we were given since some of the objects aren't detected
