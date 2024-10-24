@@ -1,0 +1,13 @@
+See if can be added:
+- ladder
+- piano
+- watch
+- wheel
+- shelf
+- camera
+- building
+
+# First, detect objects using YOLO11 base model
+# Then, train a custom one based on the data set (And Roboflow thousands of images) we were given since some of the objects aren't detected
+# Run both YOLO11 and our custom model on the image, then combine them together to get better result and more items
+# Win hackweek
