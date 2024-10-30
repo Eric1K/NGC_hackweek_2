@@ -1,43 +1,43 @@
 import cv2
 from ultralytics import YOLO
-import matplotlib.pyplot as plt
+import time
+from fastapi import Request
 
-# Use yolo11s since it is lightweight and better for realtime
-model = YOLO('yolo11s.pt') 
+model = YOLO('yolo11s.pt')
 
-def detect_from_camera():
-    """
-    Runs real time YOLO object detection on video from the webcam
-    """
-    cap = cv2.VideoCapture(0)  # 0 is usually the built-in webcam, use another if not working
-    
+async def detect_from_camera(request: Request):
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
     if not cap.isOpened():
         print("Error: Could not open webcam.")
         return
 
-    while True:
-        # Capture frame-by-frame from the webcam
-        ret, frame = cap.read()
-        
-        if not ret:
-            print("Error: Failed to capture image.")
-            break
-        
-        # Run YOLO object detection on the current frame
-        results = model(frame)
+    try:
+        while True:
+            # Check if the client has disconnected
+            if await request.is_disconnected():
+                print("Client disconnected, releasing camera.")
+                break
 
-        result_img = results[0].plot()  # Visualize on the frame
+            ret, frame = cap.read()
+            if not ret:
+                print("Error: Failed to capture image.")
+                cap.release()
+                cap = cv2.VideoCapture(0)
+                time.sleep(1)
+                continue
 
-        cv2.imshow('YOLO Object Detection', result_img)
+            results = model(frame)
+            result_img = results[0].plot(show=False)
 
-        # Exit if Q is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            ret, buffer = cv2.imencode('.jpg', result_img)
+            if not ret:
+                continue
 
-    # Destroy
-    cap.release()
-    cv2.destroyAllWindows()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
-if __name__ == "__main__":
-    print("Launching...")
-    detect_from_camera()
+    finally:
+        cap.release()  # Ensure the camera is released once the loop is exited

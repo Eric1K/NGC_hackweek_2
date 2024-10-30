@@ -14,7 +14,12 @@
     <div>
         <img id="uploadedImage" style="display:none;" />
     </div>
-
+    <div>
+    <a id="downloadImageLink" download="processed_image.jpg">Download Image</a>
+    </div>
+    <div>
+    <a href="/image_data" download="image_data.json">Download Detection Data</a>
+    </div>
     <script>
         async function uploadImage() {
             const input = document.getElementById('imageFile');
@@ -48,14 +53,23 @@
                 imgElement.src = imageURL;
                 imgElement.style.display = 'block';
 
+                const downloadLink = document.getElementById('downloadImageLink');
+                downloadLink.href = imageURL;  // Dynamically set the href for download
+                
+
+
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
         }
+
     </script>
 
-<form action="/" metod="get">
+<form action="/" method="get">
     <button type="submit">Home</button>
+</form>
+<form action="/video_stream" metod="get">
+    <button type="submit">Video Stream</button>
 </form>
 </body>
 </html>

@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Camera Detection</title>
 </head>
 <body>
+    <button onclick="openCameraPopup()">Open Camera Detection</button>
     <form action="/">
-        <button type="submit">home</button>
-    </form> 
+        <button type="submit">Home</button>
+    </form>
+    <form action="/upload_image">
+        <button type="submit">Upload Image</button>
+    </form>
+    <script>
+        
+        function openCameraPopup() {
+            // Open a new window for camera detection
+            window.open('/video_stream_feed', 'Camera Detection', 'width=800,height=600');
+        }
+    </script>
 </body>
 </html>
