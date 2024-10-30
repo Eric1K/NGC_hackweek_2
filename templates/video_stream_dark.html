@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Stream</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        video {
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="videoElement" autoplay controls>
+            <source src="/video_stream_feed" type="video/mp4">
+        </video>
+    </div>
+    <script>
+        setInterval(() => {
+            const video = document.getElementById('videoElement');
+//reload image
+            video.src = "/video_stream_feed?" + new Date().getTime();
+
+        }, 500); // 500 milliseconds
+    </script>
+</body>
+</html> 

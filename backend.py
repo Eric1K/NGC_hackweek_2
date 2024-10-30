@@ -20,6 +20,12 @@ model = YOLO('yolo11x.pt')
 async def name(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
+
+@app.get('/video_stream_dark')
+async def name(request: Request):
+    return templates.TemplateResponse("video_stream_dark.html", {"request": request})
+
+
 #get user to the upload_image.html
 @app.get('/upload_image')
 async def name(request: Request):

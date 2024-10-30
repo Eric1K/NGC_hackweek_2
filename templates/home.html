@@ -3,11 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Object Detection App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+            animation: moveGrid 15s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* Add some depth with a gradient overlay */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, 
+                rgba(17, 24, 39, 0.7) 0%, 
+                rgba(17, 24, 39, 0.9) 100%);
+        }
+    </style>
 </head>
-<body>
-    <form action="/upload_image">
-        <button type="submit">get started</button>
-    </form>
+<body class="bg-gray-900 text-white">
+    <div class="grid-background"></div>
+    <div class="background-overlay"></div>
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Object Detection</h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl">
+                Detect and analyze objects in real-time using advanced AI technology
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mb-12">
+            <div class="bg-gray-800 p-6 rounded-lg hover:bg-gray-700 transition duration-300">
+                <div class="text-blue-400 text-3xl mb-4">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Image Upload</h3>
+                <p class="text-gray-400">Upload your images and get instant object detection results</p>
+            </div>
+            
+            <div class="bg-gray-800 p-6 rounded-lg hover:bg-gray-700 transition duration-300">
+                <div class="text-blue-400 text-3xl mb-4">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Live Detection</h3>
+                <p class="text-gray-400">Real-time object detection through your camera</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row gap-4">
+            <a href="/upload_image" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 flex items-center justify-center">
+                <i class="fas fa-upload mr-2"></i>
+                Upload Image
+            </a>
+            <a onclick="const width=800; const height=600; const left=screen.width/2-width/2; const top=screen.height/2-height/2; window.open('/video_stream_feed', 'Camera Detection', `width=${width},height=${height},left=${left},top=${top}`);" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 flex items-center justify-center">
+                <i class="fas fa-camera mr-2"></i>
+                Live Camera
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-16 text-center text-gray-500">
+            <p>Powered by YOLO Object Detection</p>
+        </div>
+    </div>
 </body>
 </html>

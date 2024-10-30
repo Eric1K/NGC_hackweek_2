@@ -4,26 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Image</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen">
 
-    <h1>Upload an Image</h1>
-    <input type="file" id="imageFile" accept="image/*">
-    <button onclick="uploadImage()">Upload</button>
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-2xl font-bold mb-4 text-center">Upload an Image</h1>
+        <div id="dropZone" class="border-2 border-dashed border-gray-600 p-4 mb-4 text-center">
+            <p id="fileName">Drag and drop an image here, or click to select a file</p>
+            <input type="file" id="imageFile" accept="image/*" class="hidden">
+        </div>
+        <style>
+            .file-dropped {
+                border-color: #4CAF50; /* Green border */
+            }
+            #previewImage {
+                display: none;
+                max-width: 100px;
+                margin-top: 10px;
+            }
+            .popup {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                transform: scale(0.9); /* Initial scale for zoom effect */
+            }
 
-    <div>
-        <img id="uploadedImage" style="display:none;" />
+            .popup.show {
+                display: flex;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.9); /* Darker background */
+                    z-index: -1;
+                    opacity: 1;
+                    transition: opacity 0.5s ease-in-out;
+                }
+                transform: scale(1); /* Scale to normal size */
+            }
+
+            .popup img {
+                max-width: 80%;
+                max-height: 80%;
+                border:white 2px;
+                border-radius: 8px;
+                box-shadow: 0 0s20px rgba(255, 255, 255, 0.7);
+                transition: transform 0.3s ease-in-out; /* Image hover effect */
+            }
+
+            .popup img:hover {
+                transform: scale(1.05); /* Slight zoom on hover */
+            }
+
+            #detectionData {
+                background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                max-width: 80%;
+            }
+
+          
+            .badge {
+                display: inline-block;
+                padding: 0.25em 0.4em;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1;
+                color: #fff;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 0.25rem;
+                margin-right: 0.5em;
+            }
+
+            .badge-label {
+                background-color: #007bff; /* Blue for labels */
+            }
+
+            .badge-confidence {
+                background-color: #28a745; /* Green for confidence */
+            }
+
+            .badge-bbox {
+                background-color: #ffc107; /* Yellow for bounding box */
+            }
+
+            .detection-card {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                margin-bottom: 10px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                display: flex;
+                align-items: center;
+            }
+
+            .detection-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            }
+
+            .icon-span {
+                font-size: 1.5em;
+                margin-right: 10px;
+            }
+
+            /* Custom dark scrollbar styles */
+            #detectionList::-webkit-scrollbar {
+                width: 8px; /* Width of the scrollbar */
+            }
+
+            #detectionList::-webkit-scrollbar-track {
+                background: #1a202c; /* Darker track color */
+                border-radius: 10px;
+            }
+
+            #detectionList::-webkit-scrollbar-thumb {
+                background-color: #2d3748; /* Darker thumb color */
+                border-radius: 10px;
+                border: 2px solid #1a202c; /* Padding around thumb */
+            }
+
+            #detectionList::-webkit-scrollbar-thumb:hover {
+                background-color: #262626; /* Slightly lighter thumb color on hover */
+            }
+        </style>
+        <button onclick="uploadImage()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300">Upload</button>
+
+        <div class="mt-4">
+            <img id="uploadedImage" class="w-full rounded-lg shadow-lg" style="display:none;" />
+            
+
+        <div class="mt-4 text-center">
+            <a id="downloadImageLink" download="processed_image.jpg" class="text-blue-400 hover:underline">Download Image</a>
+        </div>
+        <div class="mt-2 text-center">
+            <a href="/image_data" download="image_data.json" class="text-blue-400 hover:underline">Download Detection Data</a>
+        </div>
+
+
+    <div class="mt-8 flex justify-center space-x-4">
+        <form action="/" method="get">
+            <button type="submit" class="bg-gray-700 text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300">Home</button>
+        </form>
+        <form action="/video_stream" method="get">
+            <button type="submit" class="bg-gray-700 text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300">Video Stream</button>
+        </form>
     </div>
-    <div>
-    <a id="downloadImageLink" download="processed_image.jpg">Download Image</a>
     </div>
-    <div>
-    <a href="/image_data" download="image_data.json">Download Detection Data</a>
+
+    <div id="imagePopup" class="popup">
+        <button id="closePopup" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
+        <div class="flex w-full h-full">
+            <div class="w-1/2 flex justify-center items-center">
+                <img id="popupImage" class="max-w-full w-full max-h-full" />
+                
+            </div>
+            <div id="detectionData" class="w-1/2 text-gray-300 p-4" style="display:none;">
+                <h2 class="text-xl font-bold mb-2 mt-4">Detection Data</h2>
+                <ul id="detectionList" class="list-disc pl-2 max-h-full" style=" overflow-y: auto;"></ul>
+            </div>
+        </div>
     </div>
+
     <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('imageFile');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.classList.add('bg-gray-700');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('bg-gray-700');
+        });
+
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.classList.remove('bg-gray-700');
+            dropZone.classList.add('file-dropped');
+            const files = event.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                const file = files[0];
+                document.getElementById('fileName').textContent = file.name;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImage = document.getElementById('previewImage');
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         async function uploadImage() {
-            const input = document.getElementById('imageFile');
-            const file = input.files[0];
+            const file = fileInput.files[0];
 
             if (!file) {
                 alert("Please select an image file to upload.");
@@ -31,7 +226,7 @@
             }
 
             const formData = new FormData();
-            formData.append('image', file);  // Ensure this key 'image' matches the backend parameter
+            formData.append('image', file);
 
             try {
                 const response = await fetch('/upload_image', {
@@ -46,30 +241,248 @@
                     return;
                 }
 
-                // If successful, display the image
                 const blob = await response.blob();
                 const imageURL = URL.createObjectURL(blob);
-                const imgElement = document.getElementById('uploadedImage');
-                imgElement.src = imageURL;
-                imgElement.style.display = 'block';
 
+                // Show the image in a popup
+                const popup = document.getElementById('imagePopup');
+                const popupImage = document.getElementById('popupImage');
+                popupImage.src = imageURL;
+                popup.classList.add('show');
+
+                // Set download link
                 const downloadLink = document.getElementById('downloadImageLink');
-                downloadLink.href = imageURL;  // Dynamically set the href for download
-                
+                downloadLink.href = imageURL;
 
+                // Fetch and display detection data
+                const detectionResponse = await fetch('/image_data');
+                const detectionData = await detectionResponse.json();
+                displayDetectionData(detectionData);
+
+                // Close popup on "X" button click
+                const closePopupButton = document.getElementById('closePopup');
+                closePopupButton.addEventListener('click', () => {
+                    popup.classList.remove('show');
+                });
 
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
         }
 
+        function getIconForLabel(label) {
+            switch (label.toLowerCase()) {
+                case 'person':
+                    return '<i class="fas fa-user"></i>';
+                case 'car':
+                    return '<i class="fas fa-car"></i>';
+                case 'dog':
+                    return '<i class="fas fa-dog"></i>';
+                case 'cat':
+                    return '<i class="fas fa-cat"></i>';
+                case 'bicycle':
+                    return '<i class="fas fa-bicycle"></i>';
+                case 'bus':
+                    return '<i class="fas fa-bus"></i>';
+                case 'motorcycle':
+                    return '<i class="fas fa-motorcycle"></i>';
+                case 'airplane':
+                    return '<i class="fas fa-plane"></i>';
+                case 'train':
+                    return '<i class="fas fa-train"></i>';
+                case 'truck':
+                    return '<i class="fas fa-truck"></i>';
+                case 'boat':
+                    return '<i class="fas fa-ship"></i>';
+                case 'traffic light':
+                    return '<i class="fas fa-traffic-light"></i>';
+                case 'fire hydrant':
+                    return '<i class="fas fa-fire-extinguisher"></i>';
+                case 'stop sign':
+                    return '<i class="fas fa-stop-circle"></i>';
+                case 'parking meter':
+                    return '<i class="fas fa-parking"></i>';
+                case 'bench':
+                    return '<i class="fas fa-chair"></i>';
+                case 'bird':
+                    return '<i class="fas fa-dove"></i>';
+                case 'horse':
+                    return '<i class="fas fa-horse"></i>';
+                case 'sheep':
+                    return '<i class="fas fa-sheep"></i>';
+                case 'cow':
+                    return '<i class="fas fa-cow"></i>';
+                case 'elephant':
+                    return '<i class="fas fa-elephant"></i>';
+                case 'bear':
+                    return '<i class="fas fa-bear"></i>';
+                case 'zebra':
+                    return '<i class="fas fa-zebra"></i>';
+                case 'giraffe':
+                    return '<i class="fas fa-giraffe"></i>';
+                case 'backpack':
+                    return '<i class="fas fa-backpack"></i>';
+                case 'umbrella':
+                    return '<i class="fas fa-umbrella"></i>';
+                case 'handbag':
+                    return '<i class="fas fa-handbag"></i>';
+                case 'tie':
+                    return '<i class="fas fa-tie"></i>';
+                case 'suitcase':
+                    return '<i class="fas fa-suitcase"></i>';
+                case 'frisbee':
+                    return '<i class="fas fa-compact-disc"></i>';
+                case 'skis':
+                    return '<i class="fas fa-skiing"></i>';
+                case 'snowboard':
+                    return '<i class="fas fa-snowboarding"></i>';
+                case 'sports ball':
+                    return '<i class="fas fa-futbol"></i>';
+                case 'kite':
+                    return '<i class="fas fa-wind"></i>';
+                case 'baseball bat':
+                    return '<i class="fas fa-baseball-bat-ball"></i>';
+                case 'baseball glove':
+                    return '<i class="fas fa-baseball-glove"></i>';
+                case 'skateboard':
+                    return '<i class="fas fa-skateboard"></i>';
+                case 'surfboard':
+                    return '<i class="fas fa-surfboard"></i>';
+                case 'tennis racket':
+                    return '<i class="fas fa-table-tennis"></i>';
+                case 'bottle':
+                    return '<i class="fas fa-wine-bottle"></i>';
+                case 'wine glass':
+                    return '<i class="fas fa-wine-glass"></i>';
+                case 'cup':
+                    return '<i class="fas fa-coffee"></i>';
+                case 'fork':
+                    return '<i class="fas fa-utensil-fork"></i>';
+                case 'knife':
+                    return '<i class="fas fa-utensil-knife"></i>';
+                case 'spoon':
+                    return '<i class="fas fa-utensil-spoon"></i>';
+                case 'bowl':
+                    return '<i class="fas fa-bowl"></i>';
+                case 'banana':
+                    return '<i class="fas fa-banana"></i>';
+                case 'apple':
+                    return '<i class="fas fa-apple-alt"></i>';
+                case 'sandwich':
+                    return '<i class="fas fa-sandwich"></i>';
+                case 'orange':
+                    return '<i class="fas fa-orange"></i>';
+                case 'broccoli':
+                    return '<i class="fas fa-broccoli"></i>';
+                case 'carrot':
+                    return '<i class="fas fa-carrot"></i>';
+                case 'hot dog':
+                    return '<i class="fas fa-hotdog"></i>';
+                case 'pizza':
+                    return '<i class="fas fa-pizza-slice"></i>';
+                case 'donut':
+                    return '<i class="fas fa-donut"></i>';
+                case 'cake':
+                    return '<i class="fas fa-birthday-cake"></i>';
+                case 'chair':
+                    return '<i class="fas fa-chair"></i>';
+                case 'couch':
+                    return '<i class="fas fa-couch"></i>';
+                case 'potted plant':
+                    return '<i class="fas fa-seedling"></i>';
+                case 'bed':
+                    return '<i class="fas fa-bed"></i>';
+                case 'dining table':
+                    return '<i class="fas fa-table"></i>';
+                case 'toilet':
+                    return '<i class="fas fa-toilet"></i>';
+                case 'tv':
+                    return '<i class="fas fa-tv"></i>';
+                case 'laptop':
+                    return '<i class="fas fa-laptop"></i>';
+                case 'mouse':
+                    return '<i class="fas fa-mouse"></i>';
+                case 'remote':
+                    return '<i class="fas fa-remote"></i>';
+                case 'keyboard':
+                    return '<i class="fas fa-keyboard"></i>';
+                case 'cell phone':
+                    return '<i class="fas fa-mobile-alt"></i>';
+                case 'microwave':
+                    return '<i class="fas fa-microwave"></i>';
+                case 'oven':
+                    return '<i class="fas fa-oven"></i>';
+                case 'toaster':
+                    return '<i class="fas fa-toaster"></i>';
+                case 'sink':
+                    return '<i class="fas fa-sink"></i>';
+                case 'refrigerator':
+                    return '<i class="fas fa-refrigerator"></i>';
+                case 'book':
+                    return '<i class="fas fa-book"></i>';
+                case 'clock':
+                    return '<i class="fas fa-clock"></i>';
+                case 'vase':
+                    return '<i class="fas fa-vase"></i>';
+                case 'scissors':
+                    return '<i class="fas fa-cut"></i>';
+                case 'teddy bear':
+                    return '<i class="fas fa-teddy-bear"></i>';
+                case 'hair drier':
+                    return '<i class="fas fa-wind"></i>';
+                case 'toothbrush':
+                    return '<i class="fas fa-toothbrush"></i>';
+                default:
+                    return '<i class="fas fa-question"></i>'; // Default icon
+            }
+        }
+
+        function displayDetectionData(data) {
+            const detectionDataDiv = document.getElementById('detectionData');
+            const detectionList = document.getElementById('detectionList');
+            detectionList.innerHTML = ''; // Clear previous data
+
+            data.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.className = 'detection-card flex justify-between items-center';
+
+                const iconHTML = getIconForLabel(item.label);
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'icon-span';
+                iconSpan.innerHTML = iconHTML;
+
+                const labelBadge = document.createElement('span');
+                labelBadge.className = 'text-xl uppercase ml-2';
+                labelBadge.textContent = `${item.label}`;
+
+                const labelContainer = document.createElement('div');
+                labelContainer.className = 'flex items-center';
+                labelContainer.appendChild(iconSpan);
+                labelContainer.appendChild(labelBadge);
+
+                const badgeContainer = document.createElement('div');
+                badgeContainer.className = 'flex flex-col items-end';
+
+                const confidenceBadge = document.createElement('span');
+                confidenceBadge.className = 'badge badge-confidence';
+                confidenceBadge.textContent = `Confidence: ${(item.confidence * 100).toFixed(2)}%`;
+
+                const bboxBadge = document.createElement('span');
+                bboxBadge.className = 'text-sm text-neutral-500';
+                bboxBadge.textContent = `BBox: [${item.bbox.join(', ')}]`;
+
+                badgeContainer.appendChild(confidenceBadge);
+                badgeContainer.appendChild(bboxBadge);
+
+                listItem.appendChild(labelContainer);
+                listItem.appendChild(badgeContainer);
+
+                detectionList.appendChild(listItem);
+            });
+
+            detectionDataDiv.style.display = 'block';
+        }
     </script>
 
-<form action="/" method="get">
-    <button type="submit">Home</button>
-</form>
-<form action="/video_stream" metod="get">
-    <button type="submit">Video Stream</button>
-</form>
 </body>
 </html>

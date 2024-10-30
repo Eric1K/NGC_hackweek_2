@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <button onclick="openCameraPopup()">Open Camera Detection</button>
-    <form action="/">
-        <button type="submit">Home</button>
-    </form>
-    <form action="/upload_image">
-        <button type="submit">Upload Image</button>
-    </form>
+<body class="bg-gray-900 text-white">
+    <div class="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <button onclick="openCameraPopup()" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded shadow-lg">
+            Open Camera Detection
+        </button>
+        <form action="/">
+            <button type="submit" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded shadow-lg">
+                Home
+            </button>
+        </form>
+        <form action="/upload_image">
+            <button type="submit" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded shadow-lg">
+                Upload Image
+            </button>
+        </form>
+    </div>
     <script>
-        
         function openCameraPopup() {
             // Open a new window for camera detection
             window.open('/video_stream_feed', 'Camera Detection', 'width=800,height=600');
+            window.open('/video_stream_dark', 'Camera Detection 2', 'width=800,height=600');
+
         }
     </script>
 </body>
