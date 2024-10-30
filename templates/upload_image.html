@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+</head>
+<body>
+
+    <h1>Upload an Image</h1>
+    <input type="file" id="imageFile" accept="image/*">
+    <button onclick="uploadImage()">Upload</button>
+
+    <div>
+        <img id="uploadedImage" style="display:none;" />
+    </div>
+
+    <script>
+        async function uploadImage() {
+            const input = document.getElementById('imageFile');
+            const file = input.files[0];
+
+            if (!file) {
+                alert("Please select an image file to upload.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);  // Ensure this key 'image' matches the backend parameter
+
+            try {
+                const response = await fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.log('Error details:', errorData);
+                    alert("Error uploading image!");
+                    return;
+                }
+
+                // If successful, display the image
+                const blob = await response.blob();
+                const imageURL = URL.createObjectURL(blob);
+                const imgElement = document.getElementById('uploadedImage');
+                imgElement.src = imageURL;
+                imgElement.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error uploading image:', error);
+            }
+        }
+    </script>
+
+<form action="/" metod="get">
+    <button type="submit">Home</button>
+</form>
+</body>
+</html>
