@@ -63,11 +63,7 @@ async def upload_image(image: UploadFile = File(...)):
     #draws the bounding boxes, onto the image
     result_image = image[0].plot(show=False)
 
-    #resizes the image if the height is more than max pixels (500)
-    image_y, image_x = result_image.shape[:2]
-    if image_y > 500:
-        new_x, new_y = resize_image(image_x, image_y)
-        result_image = cv2.resize(result_image, (new_x, new_y))
+
     
     succeeded, result_image_data = cv2.imencode('.jpeg', result_image)
     
@@ -76,10 +72,6 @@ async def upload_image(image: UploadFile = File(...)):
     
     return StreamingResponse(io.BytesIO(result_image_data.tobytes()), media_type="image/jpeg")
 
-def resize_image(x, y):
-    max_y = 500
-    new_x = (max_y * x) // y
-    return new_x, max_y
 
 #opens the video streaming feed popup for users
 @app.get('/video_stream_feed')
