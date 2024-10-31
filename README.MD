@@ -12,7 +12,10 @@ Object Detection through image upload and real time through camera
 </div>
 
 ## How to Run:
-"""uvicorn backend:app"""
+```
+uvicorn backend:app
+```
+
 
 
 ## Developers
