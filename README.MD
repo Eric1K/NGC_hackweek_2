@@ -1,9 +1,7 @@
-# Submission for Northrop Grumman PSU Hackweek 2024
-
 # Object Optics
 Object Detection through image upload and real time through camera
 
-# Demo
+## Demo
 [![Watch the demo](https://img.youtube.com/vi/x-B1wLBg_W8/0.jpg)](https://youtu.be/x-B1wLBg_W8)
 
 ## Languages and Tools
