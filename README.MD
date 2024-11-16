@@ -3,6 +3,8 @@
 # Object Optics
 Object Detection through image upload and real time through camera
 
+[![Watch the demo](https://img.youtube.com/vi/x-B1wLBg_W8/0.jpg)](https://youtu.be/x-B1wLBg_W8)
+
 ## Languages and Tools
 <div>
     <img width=50px src="https://image.similarpng.com/very-thumbnail/2021/12/Python-programming-logo-on-transparent-background-PNG.png">&nbsp;&nbsp;&nbsp;
